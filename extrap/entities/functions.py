@@ -5,13 +5,14 @@
 # This software may be modified and distributed under the terms of a BSD-style license.
 # See the LICENSE file in the base directory for details.
 
-from typing import List, Mapping, Union
+from typing import List, Mapping, Sequence, Union
+import warnings
 
 import numpy
 from marshmallow import fields
 
 from extrap.entities.parameter import Parameter
-from extrap.entities.terms import CompoundTerm, MultiParameterTerm, CompoundTermSchema, MultiParameterTermSchema
+from extrap.entities.terms import CompoundTerm, MultiParameterTerm, CompoundTermSchema, MultiParameterTermSchema, Term
 from extrap.util.serialization_schema import BaseSchema, NumberField
 
 
@@ -84,6 +85,29 @@ class Function:
         else:
             return self.__dict__ == other.__dict__
 
+class WeigthedFunction(Function):
+    """
+    This class represents a function that has a weight assigned to it.
+    Such a function is used together with similar wighted functions in order to
+    be added together and form a combined hypothesis of existing hypotheses.
+    """
+    def __init__(self, functions: Sequence[Function], weights: Sequence[float]):
+        if len(functions) != len(weights):
+            raise RuntimeError("Each function needs a corresponding weight!")
+
+        self.weights = weights
+        self.functions = functions
+        self.normalization_factor = 1 / len(weights)
+        compound_terms = []
+        for function, weight in zip(functions, weights):
+            weight_term = Term()
+            weight_term.coefficient = weight
+            compound_terms.extend = map(lambda term: term * weight_term, function.compound_terms)
+
+        super().__init__(*compound_terms)
+    
+    def evaluate(self, parameter_value):
+        return self.normalization_factor * super().evaluate(parameter_value)
 
 class ConstantFunction(Function):
     """
