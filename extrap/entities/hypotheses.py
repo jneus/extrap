@@ -300,6 +300,10 @@ class SingleParameterHypothesis(Hypothesis):
         for i, compound_term in enumerate(self.function.compound_terms):
             compound_term.coefficient = X[i + 1]
 
+class HardwareCounterHypothesis(SingleParameterHypothesis):
+    def __init__(self, function, use_median):
+        super().__init__(function, use_median)
+        self._costs_are_calculated = True
 
 class MultiParameterHypothesis(Hypothesis):
     """
@@ -445,6 +449,9 @@ class SingleParameterHypothesisSchema(HypothesisSchema):
     def create_object(self):
         return SingleParameterHypothesis(None, None)
 
+class HardwareCounterHypothesisSchema(HypothesisSchema):
+    def create_object(self):
+        return HardwareCounterHypothesis(None, None)
 
 class MultiParameterHypothesisSchema(HypothesisSchema):
     def create_object(self):

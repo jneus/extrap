@@ -91,7 +91,7 @@ class WeigthedFunction(Function):
     Such a function is used together with similar wighted functions in order to
     be added together and form a combined hypothesis of existing hypotheses.
     """
-    def __init__(self, functions: Sequence[Function], weights: Sequence[float]):
+    def __init__(self, functions: Sequence[Function], weights: Sequence[Term]):
         if len(functions) != len(weights):
             raise RuntimeError("Each function needs a corresponding weight!")
 
@@ -100,9 +100,7 @@ class WeigthedFunction(Function):
         self.normalization_factor = 1 / len(weights)
         compound_terms = []
         for function, weight in zip(functions, weights):
-            weight_term = Term()
-            weight_term.coefficient = weight
-            compound_terms.extend = map(lambda term: term * weight_term, function.compound_terms)
+            compound_terms.extend(map(lambda term: term * weight, function.compound_terms))
 
         super().__init__(*compound_terms)
     
