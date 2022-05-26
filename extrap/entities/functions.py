@@ -85,27 +85,6 @@ class Function:
         else:
             return self.__dict__ == other.__dict__
 
-class WeigthedFunction(Function):
-    """
-    This class represents a function that has a weight assigned to it.
-    Such a function is used together with similar wighted functions in order to
-    be added together and form a combined hypothesis of existing hypotheses.
-    """
-    def __init__(self, functions: Sequence[Function], weights: Sequence[Term]):
-        if len(functions) != len(weights):
-            raise RuntimeError("Each function needs a corresponding weight!")
-
-        self.weights = weights
-        self.functions = functions
-        self.normalization_factor = 1 / len(weights)
-        compound_terms = []
-        for function, weight in zip(functions, weights):
-            compound_terms.extend(map(lambda term: term * weight, function.compound_terms))
-
-        super().__init__(*compound_terms)
-    
-    def evaluate(self, parameter_value):
-        return self.normalization_factor * super().evaluate(parameter_value)
 
 class ConstantFunction(Function):
     """
